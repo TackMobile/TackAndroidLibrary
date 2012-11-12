@@ -109,6 +109,8 @@ public abstract class AsyncDataLoader<T> extends AsyncTaskLoader<T> {
         urlConnection = (HttpURLConnection) url.openConnection();
 
         prepareRequestHeaders(urlConnection, dataRequestModel);
+
+        if (urlConnection == null || isAbandoned()) return null;
         
         if (dataRequestModel.requestType == RequestType.PUT || dataRequestModel.requestType == RequestType.POST) {
           byte[] postData = dataRequestModel.postData();
@@ -126,6 +128,8 @@ public abstract class AsyncDataLoader<T> extends AsyncTaskLoader<T> {
           }
         }
         
+        if (urlConnection == null || isAbandoned()) return null;
+        
         // Attempt to retrieve the response (network connection occurs here)
         BufferedInputStream in = new BufferedInputStream(urlConnection.getInputStream());
         
@@ -136,6 +140,8 @@ public abstract class AsyncDataLoader<T> extends AsyncTaskLoader<T> {
         
         // Validate response code
         if (responseModel.responseCode / 100 != 2) break URL_REQUEST;
+
+        if (urlConnection == null || isAbandoned()) return null;
         
         onPreHandleData(responseModel);
         
@@ -153,6 +159,7 @@ public abstract class AsyncDataLoader<T> extends AsyncTaskLoader<T> {
         responseHandler.handleResponse(responseModel);
       }
     } catch (IOException e) {
+      e.printStackTrace();
       responseModel.resultType = ResultType.ERROR_UNKNOWN;
       responseModel.headerFields = urlConnection.getHeaderFields();
       try {
