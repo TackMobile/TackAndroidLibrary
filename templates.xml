@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="true" context="java" deleted="false" description="Parcelable interface implementation stub code" enabled="true" name="parcelable">/* Parcelable implementation */
+
+public ${enclosing_type}(Parcel parcel) {
+  // ${todo} Restore instance from parcel
+}
+
+public static final Parcelable.Creator&lt;${enclosing_type}&gt; CREATOR = new Parcelable.Creator&lt;${enclosing_type}&gt;() {
+  @Override
+  public ${enclosing_type} createFromParcel(Parcel source) {
+    return new ${enclosing_type}(source);
+  }
+  @Override
+  public ${enclosing_type}[] newArray(int size) {
+    return new ${enclosing_type}[size];
+   }
+};
+
+@Override
+public void writeToParcel(Parcel dest, int flags) {
+  // ${todo} Store instance to parcel
+}
+
+@Override
+public int describeContents() {
+  return 0;
+}</template></templates>
