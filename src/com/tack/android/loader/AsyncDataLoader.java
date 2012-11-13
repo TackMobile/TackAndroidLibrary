@@ -19,7 +19,7 @@ import com.tack.android.model.DataResponseModel.ResultType;
 import com.tack.android.util.TackUtil;
 
 public abstract class AsyncDataLoader<T> extends AsyncTaskLoader<T> {
-
+  
   public interface ResponseHandler<T> {
     void handleResponse(DataResponseModel<T> responseData);
   }
@@ -37,19 +37,25 @@ public abstract class AsyncDataLoader<T> extends AsyncTaskLoader<T> {
     this.responseHandler = responseHandler;
   }
   
+  /*
+   * (non-Javadoc)
+   * Loader gets reset automatically after delivering it's result, so we can't
+   * be destructive or subsequent calls will be repeated instead of using cached
+   * data.
+   * 
+   * @see android.support.v4.content.Loader#onReset()
+   */
   @Override
-  public void reset() {
-    super.reset();
-    dataRequestModel = null;
-    dataResponseModel = null;
-    responseHandler = null;
+  public void onReset() {
+    super.onReset();
     
     close();
     urlConnection = null;
   }
   
   /**
-   * Handles a request to start the Loader.
+   * Handles a request to start the Loader. 
+   * Native AsyncTaskLoader does nothing in this method.
    */
   @Override
   protected void onStartLoading() {
@@ -58,7 +64,11 @@ public abstract class AsyncDataLoader<T> extends AsyncTaskLoader<T> {
       deliverResult(dataResponseModel.data);
     }
     
-    if (dataRequestModel == null) return;
+    if (dataRequestModel == null) {
+      // Can't do anything without a request model.
+      cancelLoad();
+      return;
+    }
 
     if (takeContentChanged() || dataResponseModel == null) {
       // If the data has changed since the last time it was loaded
