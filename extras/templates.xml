@@ -1,4 +1,36 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="true" context="java" deleted="false" description="Parcelable interface implementation stub code" enabled="true" name="parcelable">/* Parcelable implementation */
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="true" context="java" deleted="false" description="" enabled="true" name="contract">${:import(android.content.ContentValues,
+		  android.database.Cursor,
+		  android.net.Uri,
+		  android.provider.BaseColumns,
+		  com.pearson.api.provider.PearsonAPIContract)}
+
+public interface ${enclosing_type}Columns {
+  // TODO Define columns
+  ${cursor}
+}
+
+public static class ${enclosing_type}Contract implements BaseColumns, ${enclosing_type}Columns, PearsonAPIContract {
+  public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath("${var}").build();
+  public static final String CONTENT_TYPE_LIST = ContentResolver.CURSOR_DIR_BASE_TYPE+"/vnd.pearson.api.${var}";
+  public static final String CONTENT_TYPE_ITEM = ContentResolver.CURSOR_ITEM_BASE_TYPE+"/vnd.pearson.api.${var}";
+
+  public static final String[] ALL_COLUMNS = {
+    // TODO List columns
+  };
+
+  public static ContentValues getContentValues(${enclosing_type} ${var}) {
+    ContentValues cv = new ContentValues();
+    // TODO Create content values
+    return cv; 
+  }
+
+  public static ${enclosing_type} fromCursor(Cursor cursor) {
+    ${enclosing_type} ${var} = new ${enclosing_type}();
+    // TODO Create ${enclosing_type} from cursor
+    return ${var};
+  }
+}
+</template><template autoinsert="true" context="java" deleted="false" description="Parcelable interface implementation stub code" enabled="true" name="parcelable">/* Parcelable implementation */
 
 public ${enclosing_type}(Parcel parcel) {
   // ${todo} Restore instance from parcel

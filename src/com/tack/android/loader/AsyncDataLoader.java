@@ -81,11 +81,31 @@ public abstract class AsyncDataLoader<T> extends AsyncTaskLoader<T> {
   public T loadInBackground() {
     if (dataRequestModel == null) return null;
     
-    dataResponseModel = execute();
+    boolean fetched = attemptPreFetch();
     
-    return dataResponseModel.data;
+    if (!fetched || dataResponseModel == null) {
+      dataResponseModel = execute();
+    }
+    
+    return dataResponseModel != null ? dataResponseModel.data : null;
   }
   
+  private boolean attemptPreFetch() {
+    T data = onPreFetch();
+    if (data != null) {
+      dataResponseModel = new DataResponseModel<T>();
+      dataResponseModel.data = data;
+      dataResponseModel.resultType = ResultType.SUCCESS;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
+  /**
+   * Performs the network request
+   * @return
+   */
   private DataResponseModel<T> execute() {
     if (null == dataRequestModel) {
       if (throwOnNullModel)
@@ -185,7 +205,7 @@ public abstract class AsyncDataLoader<T> extends AsyncTaskLoader<T> {
     return responseModel;
   }
   
-  public void prepareRequestHeaders(HttpURLConnection urlConnection, DataRequestModel requestModel) throws ProtocolException {
+  protected void prepareRequestHeaders(HttpURLConnection urlConnection, DataRequestModel requestModel) throws ProtocolException {
     // Enum request types match correct String names
     urlConnection.setRequestMethod(requestModel.requestType.toString());
 
@@ -198,6 +218,15 @@ public abstract class AsyncDataLoader<T> extends AsyncTaskLoader<T> {
       urlConnection.setRequestProperty("Accept-Charset", requestModel.charset);
       urlConnection.setRequestProperty("Content-Type", requestModel.contentType);
     }
+  }
+  
+  /**
+   * Optional method available t override to allow subclasses to attempt to find the
+   * requested data elsewhere (like a db cache) before loading from the network.
+   * @return The data to use. A null result will continue with the network request.
+   */
+  public T onPreFetch() {
+    return null;
   }
   
   /**
