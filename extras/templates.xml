@@ -11,7 +11,8 @@ public interface ${enclosing_type}Columns {
 }
 
 public static class ${enclosing_type}Contract implements BaseColumns, ${enclosing_type}Columns, PearsonAPIContract {
-  public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath("${var}").build();
+  public static final String CONTENT_PATH = "${var}";
+  public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(CONTENT_PATH).build();
   public static final String CONTENT_TYPE_LIST = ContentResolver.CURSOR_DIR_BASE_TYPE+"/vnd.pearson.api.${var}";
   public static final String CONTENT_TYPE_ITEM = ContentResolver.CURSOR_ITEM_BASE_TYPE+"/vnd.pearson.api.${var}";
 
@@ -30,6 +31,11 @@ public static class ${enclosing_type}Contract implements BaseColumns, ${enclosin
     // TODO Create ${enclosing_type} from cursor
     return ${var};
   }
+
+  public static final String TABLE_NAME = "${enclosing_type}";
+  public static final String SQL_CREATE_TABLE = "CREATE TABLE "+TABLE_NAME+" ("
+      +BaseColumns._ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "
+      +")";
 }
 </template><template autoinsert="true" context="java" deleted="false" description="Parcelable interface implementation stub code" enabled="true" name="parcelable">${:import(android.os.Parcel,
 		  android.os.Parcelable)}
