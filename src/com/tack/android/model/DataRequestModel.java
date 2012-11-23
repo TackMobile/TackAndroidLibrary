@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.apache.http.NameValuePair;
 
+import android.text.TextUtils;
+
 public class DataRequestModel {
   
   public enum RequestType {
@@ -24,6 +26,8 @@ public class DataRequestModel {
   }
   
   public String stringPostData() throws UnsupportedEncodingException {
+    if (parameters == null) return null;
+    
     String query = "";
     
     try {
@@ -43,7 +47,8 @@ public class DataRequestModel {
   }
   
   public byte[] postData() throws UnsupportedEncodingException {
-    return stringPostData().getBytes(charset);
+    String postData = stringPostData();
+    return TextUtils.isEmpty(postData) ? null : stringPostData().getBytes(charset);
   }
   
 }

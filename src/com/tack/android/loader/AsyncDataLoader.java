@@ -106,7 +106,7 @@ public abstract class AsyncDataLoader<T> extends AsyncTaskLoader<T> {
    * Performs the network request
    * @return
    */
-  private DataResponseModel<T> execute() {
+  protected DataResponseModel<T> execute() {
     if (null == dataRequestModel) {
       if (throwOnNullModel)
         throw new NullPointerException("DataFetcher must have a non-null requestModel to make a request");
@@ -142,8 +142,9 @@ public abstract class AsyncDataLoader<T> extends AsyncTaskLoader<T> {
 
         if (urlConnection == null || isAbandoned()) return null;
         
-        if (dataRequestModel.requestType == RequestType.PUT || dataRequestModel.requestType == RequestType.POST) {
-          byte[] postData = dataRequestModel.postData();
+        byte[] postData = dataRequestModel.postData();
+        if (postData != null) {
+//        if (dataRequestModel.requestType == RequestType.PUT || dataRequestModel.requestType == RequestType.POST) {
           urlConnection.setDoOutput(true);
           urlConnection.setFixedLengthStreamingMode(postData.length);
 
