@@ -128,7 +128,7 @@ public abstract class AsyncDataLoader<T> extends AsyncTaskLoader<T> {
           responseModel.responseMessage = "Invalid URL.";
           break URL_REQUEST;
         }
-      
+        
         // Check connectivity
         if (!TackUtil.isOnline(getContext())) {
           responseModel.resultType = ResultType.ERROR_NO_NETWORK;
