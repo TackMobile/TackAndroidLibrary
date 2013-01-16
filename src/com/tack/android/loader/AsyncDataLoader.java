@@ -238,6 +238,16 @@ public abstract class AsyncDataLoader<T> extends AsyncTaskLoader<T> {
   public void onPreHandleData(DataResponseModel<T> responseModel) {
   }
   
+  /**
+   * Method for processing data from URI request
+   * 
+   * @param inputStream
+   *          Stream of data to be processed. Will be consumed after this method
+   *          so must be handled here.
+   * @return Data result
+   * @throws Exception
+   *           Errors can be thrown and reported in the DataResponseModel
+   */
   public abstract T processData(BufferedInputStream inputStream) throws Exception;
   
   /**

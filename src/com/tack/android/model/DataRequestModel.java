@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.http.NameValuePair;
 
+import android.net.Uri;
 import android.text.TextUtils;
 
 public class DataRequestModel {
@@ -14,15 +15,23 @@ public class DataRequestModel {
     GET, PUT, POST, DELETE;
   }
   
+  @Deprecated
   public String requestURL;
+  
+  public Uri requestURI;
   public RequestType requestType = RequestType.GET;
   public List<NameValuePair> parameters;
   public String acceptType = "application/json";
   public String charset = "UTF-8";
   public String contentType = "application/x-www-form-urlencoded;charset=" + charset;
   
+  @Deprecated
   public DataRequestModel(String requestURL) {
     this.requestURL = requestURL;
+  }
+  
+  public DataRequestModel(Uri requestURI) {
+    this.requestURI = requestURI;
   }
   
   public String stringPostData() throws UnsupportedEncodingException {
