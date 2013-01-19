@@ -121,7 +121,7 @@ public abstract class AsyncDataLoader<T> extends AsyncTaskLoader<T> {
     try {
       URL_REQUEST: {
         try {
-          url = new URL(dataRequestModel.requestURL);
+          url = new URL(dataRequestModel.requestURI.toString());
         } catch (MalformedURLException mue) {
           // This really should never happen unless we typo one of the hard-coded urls
           responseModel.resultType = ResultType.ERROR_INVALID_URL;
