@@ -156,7 +156,7 @@ public abstract class AsyncFetcher<T> {
           responseModel.responseMessage = getContext().getString(R.string.no_network_connection);
           break URL_REQUEST;
         }
-      
+        
         mUrlConnection = (HttpURLConnection) url.openConnection();
 
         prepareRequestHeaders(mUrlConnection, mDataRequestModel);

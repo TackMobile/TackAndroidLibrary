@@ -11,7 +11,7 @@ import android.util.SparseArray;
 import com.tack.android.loader.AsyncDataLoader;
 import com.tack.android.model.DataResponseModel.ResultType;
 
-public abstract class PromiseModel  {
+public abstract class LoaderPromiseModel  {
   
   private SparseArray<Bundle> commitments;
   private ArrayList<Integer> keptCommitments = new ArrayList<Integer>();
@@ -26,7 +26,7 @@ public abstract class PromiseModel  {
   public void onCommitmentKept(int loaderId){};
   public void onCommitmentFailed(int loaderId, DataResponseModel<?> response){};
   
-  public PromiseModel() {
+  public LoaderPromiseModel() {
   }
   
   public void initialize(LoaderManager loaderManager, SparseArray<Bundle> commitments) {
@@ -81,7 +81,7 @@ public abstract class PromiseModel  {
     @SuppressWarnings("unchecked")
     @Override
     public Loader<Object> onCreateLoader(int loaderId, Bundle args) {
-      return (Loader<Object>) PromiseModel.this.onCreateLoader(loaderId, args);
+      return (Loader<Object>) LoaderPromiseModel.this.onCreateLoader(loaderId, args);
     }
     
     @Override
