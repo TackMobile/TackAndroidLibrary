@@ -4,11 +4,11 @@ import java.util.ArrayList;
 
 public class Promise {
   private ArrayList<Object> commitments;
-  private PromiseNotifier notifier;
+  private PromiseListener listener;
   
-  public Promise(PromiseNotifier promiseNotifier) {
+  public Promise(PromiseListener promiseListener) {
     commitments = new ArrayList<Object>();
-    notifier = promiseNotifier;
+    listener = promiseListener;
   }
   
   public void addCommitment(Object object) {
@@ -22,14 +22,14 @@ public class Promise {
     if (commitments.contains(object)) {
       commitments.remove(object);
       if (commitments.isEmpty()) {
-        notifier.promiseKept(notifier);
+        listener.promiseKept(listener);
       }
     }
   }
   
   public void failCommitment(Object object) {
     if (commitments.contains(object)) {
-      notifier.promiseFailed(notifier);
+      listener.promiseFailed(listener);
     }
   }
   
@@ -42,11 +42,11 @@ public class Promise {
   }
   
   
-  public interface PromiseNotifier {
+  public interface PromiseListener {
 
-    public void promiseKept(PromiseNotifier notifier);
+    public void promiseKept(PromiseListener notifier);
     
-    public void promiseFailed(PromiseNotifier notifier);
+    public void promiseFailed(PromiseListener notifier);
     
   }
 }
