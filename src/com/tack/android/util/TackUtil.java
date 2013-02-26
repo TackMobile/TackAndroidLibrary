@@ -48,5 +48,13 @@ public final class TackUtil {
     }
   }
   
+  public static String removeExtraDecimals(double d)
+  {
+      if(d == (int) d)
+          return String.format("%d",(int)d);
+      else
+          return String.format("%s",d);
+  }
+  
   private TackUtil(){}
 }
