@@ -1,5 +1,6 @@
 package com.tack.android.service;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import android.app.Service;
@@ -51,7 +52,7 @@ public abstract class TackPriorityIntentService extends Service {
   private volatile ServiceHandler mServiceHandler;
   private String mName;
   private boolean mRedelivery;
-  private PriorityBlockingQueue<QueuedIntent> mQueue;
+  PriorityBlockingQueue<QueuedIntent> mQueue;
 
   private final class QueuedIntent implements Comparable<QueuedIntent> {
     Intent intent;
@@ -68,22 +69,28 @@ public abstract class TackPriorityIntentService extends Service {
     }
   }
 
-  private final class ServiceHandler extends Handler {
-    public ServiceHandler(Looper looper) {
+  private static final class ServiceHandler extends Handler {
+    private WeakReference<TackPriorityIntentService> mServiceReference;
+
+    public ServiceHandler(Looper looper, TackPriorityIntentService service) {
       super(looper);
+      mServiceReference = new WeakReference<TackPriorityIntentService>(service);
     }
 
     @Override
     public void handleMessage(Message msg) {
-      try {
-        final QueuedIntent qi = mQueue.take();
-        onHandleIntent(qi.intent);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-      
-      if (mQueue.isEmpty()) {
-        stopSelf();
+      TackPriorityIntentService service = mServiceReference.get();
+      if (service != null) {
+        try {
+            final QueuedIntent qi = service.mQueue.take();
+            service.onHandleIntent(qi.intent);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+        
+        if (service.mQueue.isEmpty()) {
+          service.stopSelf();
+        }
       }
     }
   }
@@ -131,7 +138,7 @@ public abstract class TackPriorityIntentService extends Service {
     thread.start();
 
     mServiceLooper = thread.getLooper();
-    mServiceHandler = new ServiceHandler(mServiceLooper);
+    mServiceHandler = new ServiceHandler(mServiceLooper, this);
     mQueue = new PriorityBlockingQueue<QueuedIntent>();
   }
 

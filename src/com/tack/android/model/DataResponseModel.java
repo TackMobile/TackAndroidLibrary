@@ -12,6 +12,7 @@ public class DataResponseModel<T> {
     ERROR_TOKEN_REFRESH_FAILED,
     ERROR_DATA_PARSE_FAILED, 
     ERROR_UNKNOWN, 
+    ERROR_SSL,
     ERROR_INVALID_URL
   }
   

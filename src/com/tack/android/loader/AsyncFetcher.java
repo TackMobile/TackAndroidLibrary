@@ -8,9 +8,12 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 
+import javax.net.ssl.SSLHandshakeException;
+
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.tack.android.R;
 import com.tack.android.model.DataRequestModel;
@@ -24,6 +27,8 @@ public abstract class AsyncFetcher<T> {
   public interface ResponseHandler<T> {
     void handleResponse(DataResponseModel<T> responseData);
   }
+
+  private static final String TAG = "Tack.AsyncFetcher";
 
   private Context mContext;
   private HttpURLConnection mUrlConnection;
@@ -157,7 +162,7 @@ public abstract class AsyncFetcher<T> {
           break URL_REQUEST;
         }
         
-        mUrlConnection = (HttpURLConnection) url.openConnection();
+        mUrlConnection = openURLConnection(url);
 
         prepareRequestHeaders(mUrlConnection, mDataRequestModel);
 
@@ -182,7 +187,16 @@ public abstract class AsyncFetcher<T> {
         if (mUrlConnection == null || isCancelled()) return null;
         
         // Attempt to retrieve the response (network connection occurs here)
-        BufferedInputStream in = new BufferedInputStream(mUrlConnection.getInputStream());
+        BufferedInputStream in = null;
+        try {
+          in = new BufferedInputStream(mUrlConnection.getInputStream());
+        } catch (SSLHandshakeException sslhe) {
+          // ignore
+          Log.d(TAG, sslhe.getMessage());
+          responseModel.resultType = ResultType.ERROR_SSL;
+        } finally {
+          if (in == null) return responseModel;
+        }
         
         // Retrieve header values
         responseModel.headerFields = mUrlConnection.getHeaderFields();
@@ -220,6 +234,10 @@ public abstract class AsyncFetcher<T> {
     }
     
     return responseModel;
+  }
+  
+  protected HttpURLConnection openURLConnection(URL url) throws IOException {
+    return (HttpURLConnection) url.openConnection();
   }
 
   /**
