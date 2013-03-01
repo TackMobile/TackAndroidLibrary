@@ -213,6 +213,8 @@ public abstract class AsyncFetcher<T> {
           responseModel.resultType = ResultType.SUCCESS;
         } catch (Exception exception) {
           responseModel.resultType = ResultType.ERROR_DATA_PARSE_FAILED;
+          responseModel.responseMessage = exception.getMessage();
+          Log.d(TAG, responseModel.responseMessage);
         }
       }
       
