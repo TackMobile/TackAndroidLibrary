@@ -12,8 +12,16 @@ public class ConfigUtil {
     return Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD;
   }
 
+  public static boolean hasV11() {
+    return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
+  }
+  
   public static boolean hasV12() {
     return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1;
+  }
+
+  public static boolean hasV13() {
+    return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2;
   }
   
   public static boolean hasV16() {
