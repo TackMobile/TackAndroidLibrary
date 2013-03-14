@@ -581,7 +581,7 @@ public class ImageCache {
           super.onCreate(savedInstanceState);
 
           // Make sure this Fragment is retained over a configuration change
-          setRetainInstance(true);
+          //setRetainInstance(true);
       }
 
       /**
