@@ -1,6 +1,8 @@
 package com.tack.android.service;
 
 import java.lang.ref.WeakReference;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import android.app.Service;
@@ -10,6 +12,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 
 /**
  * IntentService is a base class for {@link Service}s that handle asynchronous
@@ -61,7 +64,7 @@ public abstract class TackPriorityIntentService extends Service {
     public QueuedIntent(Intent i) {
       intent = i;
     }
-
+    
     @Override
     public int compareTo(QueuedIntent another) {
       if (priority == another.priority) return 0;
@@ -144,6 +147,9 @@ public abstract class TackPriorityIntentService extends Service {
 
   @Override
   public void onStart(Intent intent, int startId) {
+    // bail out immediately if a duplicate exists
+    if (checkForDuplicate(intent)) return;
+    
     final QueuedIntent qi = new QueuedIntent(intent);
     final int priority = intent.getIntExtra(EXTRA_PRIORITY, PRIORITY_DEFAULT);
     switch (priority) {
@@ -160,7 +166,26 @@ public abstract class TackPriorityIntentService extends Service {
     mQueue.add(qi);
     mServiceHandler.sendEmptyMessage(0);
   }
-
+  
+  public boolean checkForDuplicate(Intent intent) {
+    if (intent == null) return true;
+    if (mQueue == null || mQueue.isEmpty()) return false;
+    
+    final Iterator<QueuedIntent> iterator = mQueue.iterator();
+    Comparator<Intent> comparator = getIntentComparator();
+    QueuedIntent qi;
+    while(iterator.hasNext()) {
+      qi = iterator.next();
+      if (comparator.compare(qi.intent, intent) == 0) {
+        //Log.v("TACK.TackPriorityIntentService", "Removing Dupilicate!");
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  protected abstract Comparator<Intent> getIntentComparator();
+  
   /**
    * You should not override this method for your IntentService. Instead,
    * override {@link #onHandleIntent}, which the system calls when the
