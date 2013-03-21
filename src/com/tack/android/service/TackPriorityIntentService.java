@@ -12,7 +12,6 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 
 /**
  * IntentService is a base class for {@link Service}s that handle asynchronous
