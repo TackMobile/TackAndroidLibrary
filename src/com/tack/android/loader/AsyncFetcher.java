@@ -38,11 +38,20 @@ public abstract class AsyncFetcher<T> {
   protected AsyncFetcher.ResponseHandler<T> mResponseHandler;
   protected boolean mThrowOnNullModel = true;
   private boolean mIsCancelled;
+  private boolean mDebug = false;
   
   public AsyncFetcher(Context context, DataRequestModel requestModel, AsyncFetcher.ResponseHandler<T> responseHandler) {
     mContext = context;
     mDataRequestModel = requestModel;
     mResponseHandler = responseHandler;
+  }
+  
+  public void setDebugOn() {
+    mDebug = true;
+  }
+  
+  public void setDebugOff() {
+    mDebug = false;
   }
   
   public Context getContext() {
@@ -155,6 +164,8 @@ public abstract class AsyncFetcher<T> {
           break URL_REQUEST;
         }
         
+        if (mDebug) Log.d(TAG, "HttpUrlConnection :: Attempting connection - "+url.toString());
+        
         // Check connectivity
         if (!TackUtil.isOnline(getContext())) {
           responseModel.resultType = ResultType.ERROR_NO_NETWORK;
@@ -163,21 +174,28 @@ public abstract class AsyncFetcher<T> {
         }
         
         mUrlConnection = openURLConnection(url);
-
         prepareRequestHeaders(mUrlConnection, mDataRequestModel);
+        
+        if (mDebug) Log.d(TAG, "HttpUrlConnection :: Request header properties - "+mUrlConnection.getRequestProperties().toString());
+        
+        mUrlConnection.setDoInput(true);
 
         if (mUrlConnection == null || isCancelled()) return null;
         
-        byte[] postData = mDataRequestModel.postData();
+        byte[] postData = mDataRequestModel.getPostData();
         if (postData != null) {
           mUrlConnection.setDoOutput(true);
+          mUrlConnection.setRequestMethod("POST");
           mUrlConnection.setFixedLengthStreamingMode(postData.length);
+          
+          if (mDebug) Log.d(TAG, "HttpUrlConnection :: POSTing data - "+new String(postData));
 
           OutputStream out = null;
           try {
             // Attempt to post data (network connection occurs here)
             out = mUrlConnection.getOutputStream();
             out.write(postData);
+            out.flush();
           } finally {
             if (null != out)
               out.close();
@@ -189,13 +207,12 @@ public abstract class AsyncFetcher<T> {
         // Attempt to retrieve the response (network connection occurs here)
         BufferedInputStream in = null;
         try {
+          if (mDebug) Log.d(TAG, "HttpUrlConnection :: Attempting receive data");
           in = new BufferedInputStream(mUrlConnection.getInputStream());
         } catch (SSLHandshakeException sslhe) {
           // ignore
           Log.d(TAG, sslhe.getMessage());
           responseModel.resultType = ResultType.ERROR_SSL;
-        } finally {
-          if (in == null) return responseModel;
         }
         
         // Retrieve header values
@@ -203,18 +220,22 @@ public abstract class AsyncFetcher<T> {
         responseModel.responseCode = mUrlConnection.getResponseCode();
         responseModel.responseMessage = mUrlConnection.getResponseMessage();
         
+        if (mDebug) Log.d(TAG, "HttpUrlConnection :: Connected - "+responseModel.responseCode+" "+responseModel.responseMessage);
+        
         // Validate response code
         if (responseModel.responseCode / 100 != 2) break URL_REQUEST;
 
         if (mUrlConnection == null || isCancelled()) return null;
         
-        try {
-          responseModel.data = processData(in);
-          responseModel.resultType = ResultType.SUCCESS;
-        } catch (Exception exception) {
-          responseModel.resultType = ResultType.ERROR_DATA_PARSE_FAILED;
-          responseModel.responseMessage = exception.getMessage();
-          Log.d(TAG, responseModel.responseMessage);
+        if (in != null) {
+          try {
+            responseModel.data = processData(in);
+            responseModel.resultType = ResultType.SUCCESS;
+          } catch (Exception exception) {
+            responseModel.resultType = ResultType.ERROR_DATA_PARSE_FAILED;
+            responseModel.responseMessage = exception.getMessage();
+            Log.d(TAG, responseModel.responseMessage);
+          }
         }
       }
       
@@ -264,7 +285,11 @@ public abstract class AsyncFetcher<T> {
   protected void prepareRequestHeaders(HttpURLConnection urlConnection, DataRequestModel requestModel) throws ProtocolException {
     // Enum request types match correct String names
     urlConnection.setRequestMethod(requestModel.requestType.toString());
-
+    
+    // TODO: Content-Length: 132 ???
+    if (requestModel.requestType == RequestType.POST)
+      urlConnection.setRequestProperty("Content-Length", String.valueOf(requestModel.getPostDataLength()));
+    
     // Fake the Firefox user-agent to deal with potentially fussy servers
     urlConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.2.3) Gecko/20100401");
 
@@ -272,7 +297,7 @@ public abstract class AsyncFetcher<T> {
     
     if (requestModel.requestType == RequestType.POST) {
       urlConnection.setRequestProperty("Accept-Charset", requestModel.charset);
-      urlConnection.setRequestProperty("Content-Type", requestModel.contentType);
+      urlConnection.setRequestProperty("Content-Type", requestModel.getContentType());
     }
   }
   

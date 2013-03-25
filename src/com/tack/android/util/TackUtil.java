@@ -58,5 +58,16 @@ public final class TackUtil {
     else
       return String.format("%s", d);
   }
-}  
-
+  
+  public static String stringArrayToCsv(String[] stringArray) {
+    if (stringArray == null) return null;
+    final StringBuilder sb = new StringBuilder();
+    final int count = stringArray.length;
+    for(int i=0; i<count; i++) {
+      sb.append(stringArray[i]);
+      if (i<count-1)
+        sb.append(",");
+    }
+    return sb.toString(); 
+  }
+}

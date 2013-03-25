@@ -142,7 +142,7 @@ public abstract class AsyncDataLoader<T> extends AsyncTaskLoader<T> {
 
         if (urlConnection == null || isAbandoned()) return null;
         
-        byte[] postData = dataRequestModel.postData();
+        byte[] postData = dataRequestModel.getPostData();
         if (postData != null) {
 //        if (dataRequestModel.requestType == RequestType.PUT || dataRequestModel.requestType == RequestType.POST) {
           urlConnection.setDoOutput(true);
@@ -217,7 +217,7 @@ public abstract class AsyncDataLoader<T> extends AsyncTaskLoader<T> {
     
     if (requestModel.requestType == RequestType.POST) {
       urlConnection.setRequestProperty("Accept-Charset", requestModel.charset);
-      urlConnection.setRequestProperty("Content-Type", requestModel.contentType);
+      urlConnection.setRequestProperty("Content-Type", requestModel.getContentType());
     }
   }
   

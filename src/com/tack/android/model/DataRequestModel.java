@@ -15,26 +15,48 @@ public class DataRequestModel {
     GET, PUT, POST, DELETE;
   }
   
-  @Deprecated
-  public String requestURL;
-  
   public Uri requestURI;
   public RequestType requestType = RequestType.GET;
-  public List<NameValuePair> parameters;
-  public String acceptType = "application/json";
-  public String charset = "UTF-8";
-  public String contentType = "application/x-www-form-urlencoded;charset=" + charset;
-  
-  @Deprecated
-  public DataRequestModel(String requestURL) {
-    this.requestURL = requestURL;
-  }
+  public final String acceptType = "application/json";
+  public final String charset = "UTF-8";
+  private String contentType = "application/x-www-form-urlencoded;charset=" + charset;
+
+  private byte[] mPostData;
   
   public DataRequestModel(Uri requestURI) {
     this.requestURI = requestURI;
   }
   
-  public String stringPostData() throws UnsupportedEncodingException {
+  public void setPostData(List<NameValuePair> nameValuePairs) throws UnsupportedEncodingException {
+    String data = nameValuePairsToString(nameValuePairs, charset);
+    if (!TextUtils.isEmpty(data))
+      setPostDataBytes(data.getBytes(charset));
+    else
+      setPostDataBytes(null);
+  }
+  
+  public void setPostDataBytes(byte[] data) {
+    requestType = data == null ? RequestType.GET : RequestType.POST;
+    mPostData = data;
+  }
+  
+  public byte[] getPostData() throws UnsupportedEncodingException {
+    return mPostData;
+  }
+  
+  public int getPostDataLength() {
+    return mPostData.length;
+  }
+  
+  public void setContentType(String contentType) {
+    this.contentType = contentType;
+  }
+  
+  public String getContentType() {
+    return contentType;
+  }
+  
+  public static String nameValuePairsToString(List<NameValuePair> parameters, String charset) throws UnsupportedEncodingException {
     if (parameters == null) return null;
     
     String query = "";
@@ -53,11 +75,6 @@ public class DataRequestModel {
     }
     
     return query;
-  }
-  
-  public byte[] postData() throws UnsupportedEncodingException {
-    String postData = stringPostData();
-    return TextUtils.isEmpty(postData) ? null : stringPostData().getBytes(charset);
   }
   
 }
