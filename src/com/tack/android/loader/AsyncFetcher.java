@@ -326,8 +326,6 @@ public abstract class AsyncFetcher<T> {
 
     if (mResponseHandler != null)
       mResponseHandler.handleResponse(getResponse());
-    
-    mContext = null;
   }
 
   /**
