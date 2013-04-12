@@ -1,4 +1,3 @@
 <resources>
-    <string name="app_name">TackLibrary</string>
     <string name="no_network_connection">No network connection</string>
 </resources>
