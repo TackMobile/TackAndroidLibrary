@@ -1,5 +1,6 @@
 package com.tack.android.model;
 
+import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Map;
 
@@ -21,4 +22,5 @@ public class DataResponseModel<T> {
   public String responseMessage;
   public Map<String, List<String>> headerFields;
   public T data;
+  public HttpURLConnection urlConnection;
 }

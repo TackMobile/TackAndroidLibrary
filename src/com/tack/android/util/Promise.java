@@ -24,6 +24,8 @@ public class Promise {
       if (commitments.isEmpty()) {
         listener.promiseKept(listener);
       }
+    } else if (commitments.isEmpty()) {
+        listener.promiseKept(listener);
     }
   }
   

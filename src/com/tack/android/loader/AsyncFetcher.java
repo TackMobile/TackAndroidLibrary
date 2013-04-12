@@ -216,6 +216,7 @@ public abstract class AsyncFetcher<T> {
         }
         
         // Retrieve header values
+        responseModel.urlConnection = mUrlConnection;
         responseModel.headerFields = mUrlConnection.getHeaderFields();
         responseModel.responseCode = mUrlConnection.getResponseCode();
         responseModel.responseMessage = mUrlConnection.getResponseMessage();
