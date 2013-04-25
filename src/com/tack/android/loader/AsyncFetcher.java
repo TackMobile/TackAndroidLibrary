@@ -205,39 +205,31 @@ public abstract class AsyncFetcher<T> {
         if (mUrlConnection == null || isCancelled()) return null;
         
         // Attempt to retrieve the response (network connection occurs here)
-        BufferedInputStream in = null;
         try {
           if (mDebug) Log.d(TAG, "HttpUrlConnection :: Attempting receive data");
-          in = new BufferedInputStream(mUrlConnection.getInputStream());
-        } catch (SSLHandshakeException sslhe) {
-          // ignore
+          BufferedInputStream in = new BufferedInputStream(mUrlConnection.getInputStream());
+          responseModel.data = processData(in);
+          responseModel.resultType = ResultType.SUCCESS;
+        } catch (SSLHandshakeException sslhe) { // ignore
           Log.d(TAG, sslhe.getMessage());
           responseModel.resultType = ResultType.ERROR_SSL;
+        } catch (Exception exception) {
+          responseModel.resultType = ResultType.ERROR_DATA_PARSE_FAILED;
+          responseModel.responseMessage = exception.getMessage();
         }
         
         // Retrieve header values
         responseModel.urlConnection = mUrlConnection;
         responseModel.headerFields = mUrlConnection.getHeaderFields();
-        responseModel.responseCode = mUrlConnection.getResponseCode();
-        responseModel.responseMessage = mUrlConnection.getResponseMessage();
-        
+        try { responseModel.responseCode = mUrlConnection.getResponseCode(); } catch (IOException exception) {}
+        try { responseModel.responseMessage = mUrlConnection.getResponseMessage(); } catch (IOException exception) {}        
+       
         if (mDebug) Log.d(TAG, "HttpUrlConnection :: Connected - "+responseModel.responseCode+" "+responseModel.responseMessage);
         
         // Validate response code
         if (responseModel.responseCode / 100 != 2) break URL_REQUEST;
 
         if (mUrlConnection == null || isCancelled()) return null;
-        
-        if (in != null) {
-          try {
-            responseModel.data = processData(in);
-            responseModel.resultType = ResultType.SUCCESS;
-          } catch (Exception exception) {
-            responseModel.resultType = ResultType.ERROR_DATA_PARSE_FAILED;
-            responseModel.responseMessage = exception.getMessage();
-            Log.d(TAG, responseModel.responseMessage);
-          }
-        }
       }
       
       if (mResponseHandler != null) {
@@ -246,13 +238,6 @@ public abstract class AsyncFetcher<T> {
     } catch (IOException e) {
       e.printStackTrace();
       responseModel.resultType = ResultType.ERROR_UNKNOWN;
-      responseModel.headerFields = mUrlConnection.getHeaderFields();
-      try {
-        responseModel.responseCode = mUrlConnection.getResponseCode();
-        responseModel.responseMessage = mUrlConnection.getResponseMessage();
-      } catch (IOException e2) {
-        // just give up
-      }
     } finally {
       close();
     }
