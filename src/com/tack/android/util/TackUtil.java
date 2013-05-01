@@ -1,5 +1,6 @@
 package com.tack.android.util;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -50,6 +51,20 @@ public final class TackUtil {
       is.close();
     }
   }
+  
+  public static String convertStreamToString(InputStream is) throws Exception {
+    BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+    StringBuilder sb = new StringBuilder();
+    String line = null;
+
+    while ((line = reader.readLine()) != null) {
+        sb.append(line);
+    }
+
+    is.close();
+
+    return sb.toString();
+}
 
   @SuppressLint("DefaultLocale")
   public static String removeExtraDecimals(double d) {
