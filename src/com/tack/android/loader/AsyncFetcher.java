@@ -185,7 +185,7 @@ public abstract class AsyncFetcher<T> {
         byte[] postData = mDataRequestModel.getPostData();
         if (postData != null) {
           mUrlConnection.setDoOutput(true);
-          mUrlConnection.setRequestMethod("POST");
+          mUrlConnection.setRequestMethod(mDataRequestModel.requestType == RequestType.PUT ? "PUT" : "POST");
           mUrlConnection.setFixedLengthStreamingMode(postData.length);
           
           if (mDebug) Log.d(TAG, "HttpUrlConnection :: POSTing data - "+new String(postData));
