@@ -11,6 +11,12 @@ import android.os.Parcelable;
  *
  */
 public class QueryArgs implements Parcelable {
+
+  /**
+   * For use as a key in a <code>Bundle</code> where the value is a <code>QueryArgs</code> instance.
+   */
+  public static final String KEY_QUERY_ARGS = "com.tack.android.util.KEY_QUERY_ARGS";
+
   public Uri uri;
   public String[] projection;
   public String selection;
@@ -38,9 +44,13 @@ public class QueryArgs implements Parcelable {
   public QueryArgs(Parcel parcel) {
     // Restore instance from parcel
     uri = parcel.readParcelable(Uri.class.getClassLoader());
-    parcel.readStringArray(projection);
+    projection = new String[parcel.readInt()];
+    if (projection.length > 0)
+      parcel.readStringArray(projection);
     selection = parcel.readString();
-    parcel.readStringArray(selectionArgs);
+    selectionArgs = new String[parcel.readInt()];
+    if (selectionArgs.length > 0)
+      parcel.readStringArray(selectionArgs);
     sortOrder = parcel.readString();
   }
 
@@ -60,9 +70,13 @@ public class QueryArgs implements Parcelable {
   public void writeToParcel(Parcel dest, int flags) {
     // Store instance to parcel
     dest.writeParcelable(uri, flags);
-    dest.writeStringArray(projection);
+    dest.writeInt(projection != null ? projection.length : 0);
+    if (projection != null && projection.length > 0)
+      dest.writeStringArray(projection);
     dest.writeString(selection);
-    dest.writeStringArray(selectionArgs);
+    dest.writeInt(selectionArgs != null ? selectionArgs.length : 0);
+    if (selectionArgs != null && selectionArgs.length > 0)
+      dest.writeStringArray(selectionArgs);
     dest.writeString(sortOrder);
   }
 
