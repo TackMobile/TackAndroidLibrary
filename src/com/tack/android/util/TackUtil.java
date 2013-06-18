@@ -51,7 +51,20 @@ public final class TackUtil {
       is.close();
     }
   }
-  
+
+  public static void appendStreamToStream(InputStream is, OutputStream os) throws IOException {
+    final byte[] buffer = new byte[256];
+    try {
+      int n;
+      while ((n = is.read(buffer)) != -1) {
+        os.write(buffer, 0, n);
+      }
+    } finally {
+      is.close();
+    }
+  }
+
+
   public static String convertStreamToString(InputStream is) throws Exception {
     BufferedReader reader = new BufferedReader(new InputStreamReader(is));
     StringBuilder sb = new StringBuilder();
