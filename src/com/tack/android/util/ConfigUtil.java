@@ -31,4 +31,8 @@ public class ConfigUtil {
   public static boolean hasV16() {
     return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
   }
+
+  public static boolean hasV17() {
+    return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1;
+  }
 }
