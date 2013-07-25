@@ -182,6 +182,11 @@ public abstract class TackPriorityIntentService extends Service {
     }
     return false;
   }
+
+  protected void clearQueue() {
+    if (mQueue != null)
+      mQueue.clear();
+  }
   
   protected abstract Comparator<Intent> getIntentComparator();
   
