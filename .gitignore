@@ -15,9 +15,21 @@ gen/
 # Local configuration file (sdk path, etc)
 local.properties
 
-# mac files
+# Mac
 .DS_Store
 
-# intellij
-# .idea
+# Eclipse
+.project
+.classpath
+.settings
+.checkstyle
+
+# IntelliJ
 # *.iml
+.idea
+*.iws
+out/
+
+# Gradle
+.gradle/
+build/
