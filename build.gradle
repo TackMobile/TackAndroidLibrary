@@ -1,35 +1,84 @@
 buildscript {
-    repositories { mavenCentral() }
-    dependencies { classpath 'com.android.tools.build:gradle:0.5.+' }
+  repositories { mavenCentral() }
+  dependencies { classpath 'com.android.tools.build:gradle:0.5.+' }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.6'
+  gradleVersion = '1.6'
 }
 
 apply plugin:'android-library'
+apply plugin:'maven'
+//apply plugin:'maven-publish'
+
+configurations {
+  deployerJars
+}
 
 repositories {
-    mavenCentral()
+  mavenCentral()
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:13.0.+'
+  compile 'com.android.support:support-v4:13.0.+'
+  deployerJars "org.kuali.maven.wagons:maven-s3-wagon:1.1.20"
 }
+
+version '1'
+group 'com.tackmobile.android'
 
 android {
-    compileSdkVersion 17
-    buildToolsVersion '17.0.0'
+  compileSdkVersion 17
+  buildToolsVersion '17.0.0'
 
-    sourceSets {
-        main {
-            manifest.srcFile 'AndroidManifest.xml'
-            java.srcDirs = ['src']
-            resources.srcDirs = ['src']
-            aidl.srcDirs = ['src']
-            renderscript.srcDirs = ['src']
-            res.srcDirs = ['res']
-            assets.srcDirs = ['assets']
-        }
+  sourceSets {
+    main {
+      manifest.srcFile 'AndroidManifest.xml'
+      java.srcDirs = ['src']
+      resources.srcDirs = ['src']
+      aidl.srcDirs = ['src']
+      renderscript.srcDirs = ['src']
+      res.srcDirs = ['res']
+      assets.srcDirs = ['assets']
     }
+  }
 }
+
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      configuration = configurations.deployerJars
+      repository(url: "s3://tack-maven/snapshot"){
+        authentication(userName: tackAccessKey, password: tackSecretKey)
+      }
+    }
+    /*mavenDeployer {
+      configuration = configurations.deployerJars
+      repository(url: "s3://tack-maven/releases"){
+        authentication(userName: tackAccessKey, password: tackSecretKey)
+      }
+    }*/
+  }
+}
+
+/*
+// This is for publishing using the 'maven' plugin,
+//   but it doesn't appear to support s3 right now
+android.libraryVariants
+publishing {
+  publications {
+    maven(MavenPublication) {
+      artifact bundleRelease
+    }
+  }
+  repositories {
+    maven {
+      name "TackMaven"
+      credentials {
+        username tackUser
+        //privatekey tackKeyFile
+      }
+      url "s3://tack-maven/snapshot"
+    }
+  }
+}*/
